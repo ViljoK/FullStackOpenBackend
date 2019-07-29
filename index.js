@@ -4,28 +4,7 @@ const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
-let persons = [
-    {
-        name: 'Viljo Karhumaa',
-        number: '0443114207',
-        id: 1,
-    },
-    {
-        name: 'Teppo Tulppu',
-        number: '0503236678',
-        id: 2,
-    },
-    {
-        name: 'Seppo Jokinen',
-        number: '0408485861',
-        id: 3,
-    },
-    {
-        name: 'Markku Kanerva',
-        number: '0206677889',
-        id: 4,
-    },
-]
+let persons = []
 
 app.get('/', (req, res) => {
     res.send('Hello world')
@@ -36,19 +15,30 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-    let id = Math.ceil(Math.random() * 1000)
-    while (persons.find(person => person.id === id)) {
-        console.log('Arvotaan uusi tunniste')
-        id = Math.ceil(Math.random() * 1000)
+    const data = req.body
+    if (!data.name || !data.number) {
+        res.statusCode = 422
+        res.send({error : 'Nimi ja/tai numero puuttuu'})
     }
-    console.log(id, req.body.name, req.body.number)
-    const newPerson = {
-        id      :   id,
-        name    :   req.body.name,
-        number  :   req.body.number
+    else if (persons.find(person => person.name === data.name)) {
+        res.statusCode = 422
+        res.send({error : `Henkilö ${data.name} löytyy jo luettelosta`})
     }
-    persons.push(newPerson)
-    res.json(persons)
+    else {
+        let id = Math.ceil(Math.random() * 1000)
+        while (persons.find(person => person.id === id)) {
+            console.log('Arvotaan uusi tunniste')
+            id = Math.ceil(Math.random() * 1000)
+        }
+        console.log(id, req.body.name, req.body.number)
+        const newPerson = {
+            id      :   id,
+            name    :   req.body.name,
+            number  :   req.body.number
+        }
+        persons.push(newPerson)
+        res.json(persons)
+    }
 })
 
 app.get('/api/persons/:id', (req, res) => {
