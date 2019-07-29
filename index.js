@@ -4,7 +4,22 @@ const bodyParser    = require('body-parser')
 const morgan        = require('morgan')
 
 app.use(bodyParser.json())
-app.use(morgan('tiny'))
+
+morgan.token('data', (req) => JSON.stringify(req.body))
+app.use(morgan((tokens, req, res) => {
+    let log = []
+    log.push(tokens.method(req))
+    log.push(tokens.url(req, res))
+    log.push(tokens.status(req, res))
+    log.push(tokens.res(req, res, 'content-length'))
+    log.push(' - ')
+    log.push(tokens['response-time'](req, res))
+    log.push('ms')
+    if (tokens.method(req) === 'POST') {
+        log.push(tokens.data(req))
+    }
+    return log.join(' ')
+}))
 
 let persons = []
 
