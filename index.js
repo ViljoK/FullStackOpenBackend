@@ -57,8 +57,6 @@ app.delete('/api/persons/:id', (req, res) => {
         res.statusCode = 404
         res.send('Poistettavaa henkilöä ei löydy')
     }
-    
-    res.json(newPersons)
 })
 
 app.get('/info', (req, res) => {
