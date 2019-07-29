@@ -32,6 +32,19 @@ app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
+app.get('/api/persons/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    console.log(`Pyydetty id: ${id}`)
+    const person = persons.find(person => person.id === id)
+    if (person) {
+        res.json(person)
+    }
+    else {
+        res.statusCode = 404
+        res.send('Pyydetyllä id:llä ei löytynyt tietoja')
+    }
+})
+
 app.get('/info', (req, res) => {
     const time = new Date().toLocaleString()
     res.send(`Puhelinluettelossa on ${persons.length} nimeä \n${time}`)
