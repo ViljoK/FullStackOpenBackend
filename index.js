@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
 
 let persons = [
     {
@@ -29,6 +32,22 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
+    res.json(persons)
+})
+
+app.post('/api/persons', (req, res) => {
+    let id = Math.ceil(Math.random() * 1000)
+    while (persons.find(person => person.id === id)) {
+        console.log('Arvotaan uusi tunniste')
+        id = Math.ceil(Math.random() * 1000)
+    }
+    console.log(id, req.body.name, req.body.number)
+    const newPerson = {
+        id      :   id,
+        name    :   req.body.name,
+        number  :   req.body.number
+    }
+    persons.push(newPerson)
     res.json(persons)
 })
 
