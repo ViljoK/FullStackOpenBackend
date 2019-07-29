@@ -32,6 +32,11 @@ app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
+app.get('/info', (req, res) => {
+    const time = new Date().toLocaleString()
+    res.send(`Puhelinluettelossa on ${persons.length} nimeä \n${time}`)
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running at port ${PORT}`)
