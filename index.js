@@ -92,7 +92,7 @@ app.get('/info', (req, res) => {
     res.send(`Puhelinluettelossa on ${persons.length} nimeä \n${time}`)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running at port ${PORT}`)
 })
