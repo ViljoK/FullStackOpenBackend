@@ -45,6 +45,22 @@ app.get('/api/persons/:id', (req, res) => {
     }
 })
 
+app.delete('/api/persons/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    console.log(`Pyydetty poistamaan id: ${id}`)
+    const personToDelete = persons.find(person => person.id === id)
+    if (personToDelete) {
+        persons = persons.filter(person => person.id !== id)
+        res.send(`Poistettiin ${personToDelete.name}`)
+    }
+    else {
+        res.statusCode = 404
+        res.send('Poistettavaa henkilöä ei löydy')
+    }
+    
+    res.json(newPersons)
+})
+
 app.get('/info', (req, res) => {
     const time = new Date().toLocaleString()
     res.send(`Puhelinluettelossa on ${persons.length} nimeä \n${time}`)
