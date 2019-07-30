@@ -70,8 +70,23 @@ app.get('/api/persons/:id', (req, res) => {
         res.json(person)
     }
     else {
-        res.statusCode = 404
+        res.statusCode = 422
         res.send('Pyydetyllä id:llä ei löytynyt tietoja')
+    }
+})
+
+app.put('/api/persons/:id', (req,res) => {
+    console.log(req.body)
+    const id = parseInt(req.params.id)
+    console.log(id)
+    const index = persons.findIndex(person => person.id === id)
+    if (index !== -1) {
+        persons[index].number = req.body.number
+        res.send(persons[index])
+    }
+    else {
+        res.statusCode = 422
+        res.send({error : `No matching persons with id: ${req.params.id}`})
     }
 })
 
