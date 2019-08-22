@@ -40,17 +40,19 @@ app.get('/api/persons', (req, res) => {
 app.post('/api/persons', (req, res) => {
     const data = req.body
     if (!data.name || !data.number) {
-        return res.status(422).json({error : 'Nimi ja/tai numero puuttuu'})
+        res.status(422).json({error : 'Nimi ja/tai numero puuttuu'})
     }
-    const person = new Person({
-        name:   data.name,
-        number: data.number,
-    })
-    person.save().then(savedPerson => {
-        res.status(200).json(savedPerson.toJSON())
-    }).catch(error => {
-        res.status(421).json({error: error.message})
-    })
+    else {
+        const person = new Person({
+            name:   data.name,
+            number: data.number,
+        })
+        person.save().then(savedPerson => {
+            res.status(200).json(savedPerson.toJSON())
+        }).catch(error => {
+            res.status(421).json({error: error.message})
+        })
+    }
 })
 
 app.get('/api/persons/:id', (req, res) => {
