@@ -31,65 +31,73 @@ app.get('/', (req, res) => {
     res.send('Hello world')
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(persons => {
         res.status(200).json(persons.map(person => person.toJSON()))
-    })
+    }).catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const data = req.body
     if (!data.name || !data.number) {
-        res.status(422).json({error : 'Nimi ja/tai numero puuttuu'})
+        return res.status(422).json({ error : 'Nimi ja/tai numero puuttuu' })
     }
-    else {
-        const person = new Person({
-            name:   data.name,
-            number: data.number,
-        })
-        person.save().then(savedPerson => {
-            res.status(200).json(savedPerson.toJSON())
-        }).catch(error => {
-            res.status(421).json({error: error.message})
-        })
-    }
+    const person = new Person({
+        name:   data.name,
+        number: data.number,
+    })
+    person.save().then(savedPerson => {
+        res.status(200).json(savedPerson.toJSON())
+    }).catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     const id = parseInt(req.params.id)
     Person.findById(id).then(person => {
         res.status(200).json(person.toJSON())
-    }).catch(error => {
-        res.status(421).json({error: error.message})
-    })
+    }).catch(error => next(error))
 })
 
-app.put('/api/persons/:id', (req,res) => {
+app.put('/api/persons/:id', (req,res, next) => {
     const id = req.params.id
-    Person.updateOne({_id: id}, {number: req.body.number}).then(updateRes => {
-        res.status(200).json({error: 0, message: 'Update successfull'})
-    }).catch(error => {
-        res.status(421).json({error: error.message})
-    })
+    Person.updateOne({ _id: id }, { number: req.body.number }).then(() => {
+        Person.find({}).then(persons => {
+            res.status(200).json(persons.map(person => person.toJSON()))
+        })
+    }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     const id = req.params.id
-    Person.deleteOne({_id: id}).then(delRes => {
-        res.json(delRes)
-    }).catch(error => {
-        res.status(421).json({error: error.message})
-    })
+    Person.deleteOne({ _id: id }).then(() => {
+        Person.find({}).then(persons => {
+            res.status(200).json(persons.map(person => person.toJSON()))
+        })
+    }).catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
     const time = new Date().toLocaleString()
     Person.countDocuments().then(count => {
-        res.status(200).json({count: count, time: time})
-    }).catch(error => {
-        res.status(421).json({error: error.message})
-    })
+        res.status(200).json({ count: count, time: time })
+    }).catch(error => next(error))
 })
+
+const unknownEndPoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndPoint)
+
+const errorHandler = (err, req, res, next) => {
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
+        return res.status(400).send({ error: 'malformatted id' })
+    }
+    else if (err.name === 'ValidationError') {
+        return res.status(422).send({ error: err.message, name: err.name })
+    }
+    next(err)
+}
+app.use(errorHandler)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running at port ${process.env.PORT}`)
