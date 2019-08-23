@@ -4,7 +4,9 @@
   "description": "Blogilista",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --verbose",
+    "lint": "eslint .",
+    "watch": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,10 @@
   },
   "devDependencies": {
     "eslint": "^6.2.1",
+    "jest": "^24.9.0",
     "nodemon": "^1.19.1"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
