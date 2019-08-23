@@ -1,3 +1,7 @@
 /Persons/node_modules
 /Persons/package-lock.json
 /Persons/.env
+
+/Blogs/node_modules
+/Blogs/package-lock.json
+/Blogs/.env
