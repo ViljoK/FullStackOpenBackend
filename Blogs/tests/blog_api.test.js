@@ -36,23 +36,23 @@ describe('HTTP POST', () => {
         await (api)
             .post('/api/blogs')
             .send(helper.insertBlog)
-        const response = await api.get('/api/blogs')
-        expect(response.body.length).toBe(helper.initialBlogs.length + 1)
+        const blogs = await helper.blogsInDb()
+        expect(blogs.length).toBe(helper.initialBlogs.length + 1)
     })
     test('spesific blog inserted', async () => {
         await (api)
             .post('/api/blogs')
             .send(helper.insertBlog)
-        const response = await api.get('/api/blogs')
-        const titles = response.body.map((r) => r.title)
+        const blogs = await helper.blogsInDb()
+        const titles = blogs.map((blog) => blog.title)
 
         expect(titles).toContain('Sienestys')
     })
     test('likes default is 0', async () => {
-        const result = await (api)
+        const res = await (api)
             .post('/api/blogs')
             .send(helper.insertBlog)
-        expect(result.body.likes).toBe(0)
+        expect(res.body.likes).toBe(0)
     })
     test('if required data does not exists', async () => {
         const res = await (api)
@@ -60,6 +60,75 @@ describe('HTTP POST', () => {
             .send(helper.invalidBlog)
         expect(res.statusCode).toBe(422)
         expect(res.body.name).toBe('ValidationError')
+    })
+})
+
+describe('HTTP DELETE', () => {
+    test('can delete', async () => {
+        let blogs = await helper.blogsInDb()
+        const id = blogs[0].id
+
+        await api.delete(`/api/blogs/${id}`)
+        blogs = await helper.blogsInDb()
+
+        expect(blogs.length).toBe(helper.initialBlogs.length - 1)
+    })
+    test('spesific data to be deleted', async () => {
+        let blogs = await helper.blogsInDb()
+        const id = blogs[0].id
+        const title = blogs[0].title
+
+        await api.delete(`/api/blogs/${id}`)
+        blogs = await helper.blogsInDb()
+        const titles = blogs.map((blog) => blog.title)
+
+        expect(titles).toEqual(expect.not.arrayContaining([title]))
+    })
+    test('deleting with nonexisting id', async () => {
+        const id = await helper.nonExistingId()
+
+        const res = await api.delete(`/api/blogs/${id}`)
+        const blogs = await helper.blogsInDb()
+
+        expect(blogs.length).toBe(helper.initialBlogs.length)
+        expect(res.statusCode).toBe(400)
+    })
+})
+
+describe('HTTP PUT', () => {
+    test('can increase by amount', async () => {
+        let blogs = await helper.blogsInDb()
+        const id = blogs[0].id
+        const likesBefore = blogs[0].likes
+
+        const result = await api.put(`/api/blogs/${id}`).send({ amount: 12 })
+        blogs = await helper.blogsInDb()
+
+        expect(blogs[0].id).toBe(id)
+        expect(blogs[0].likes).toBe(likesBefore + 12)
+        expect(result.body.likes).toBe(likesBefore)
+    })
+    test('increases by one if amount not set', async () => {
+        let blogs = await helper.blogsInDb()
+        const id = blogs[0].id
+        const likesBefore = blogs[0].likes
+
+        const result = await api.put(`/api/blogs/${id}`)
+        blogs = await helper.blogsInDb()
+
+        expect(blogs[0].id).toBe(id)
+        expect(blogs[0].likes).toBe(likesBefore + 1)
+        expect(result.body.likes).toBe(likesBefore)
+    })
+    test('put with nonexisting id', async () => {
+        const blogsBefore = await helper.blogsInDb()
+        const id = await helper.nonExistingId()
+
+        const res = await api.put(`/api/blogs/${id}`)
+        const blogsAfter = await helper.blogsInDb()
+
+        expect(blogsAfter).toEqual(blogsBefore)
+        expect(res.statusCode).toBe(400)
     })
 })
 

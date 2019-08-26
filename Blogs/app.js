@@ -11,7 +11,7 @@ const app = express()
 
 logger.info(`Start connecting to ${config.MONGODB_URI}`)
 
-mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true })
+mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false })
     .then(() => {
         logger.info('Connected')
     }).catch(() => {

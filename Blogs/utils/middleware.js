@@ -9,8 +9,11 @@ const errorHandler = (err, req, res, next) => {
     if (err.name === 'CastError' && err.kind === 'ObjectId') {
         return res.status(400).send({ error: 'malformatted id' })
     }
-    else if (err.name === 'ValidationError') {
+    if (err.name === 'ValidationError') {
         return res.status(422).send({ error: err.message, name: err.name })
+    }
+    if (err.name === 'NonExistingId') {
+        return res.status(400).send({ error: err.message, name: err.name })
     }
     next(err)
 }
