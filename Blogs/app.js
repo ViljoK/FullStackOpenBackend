@@ -5,16 +5,17 @@ const cors = require('cors')
 const blogsRouter = require('./controllers/blogs')
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
+const logger = require('./utils/logger')
 
 const app = express()
 
-console.log(`Start connecting to ${config.MONGODB_URI}`)
+logger.info(`Start connecting to ${config.MONGODB_URI}`)
 
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true })
     .then(() => {
-        console.log('Connected')
+        logger.info('Connected')
     }).catch(() => {
-        console.log('Connectin error')
+        logger.info('Connectin error')
     })
 
 app.use(cors())
