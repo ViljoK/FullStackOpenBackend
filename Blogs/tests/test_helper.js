@@ -5,25 +5,29 @@ const initialBlogs = [
         author: 'Jussi J',
         title: 'RuokaBlogi',
         url: 'ruokaa.fi',
-        likes: 4
+        likes: 4,
+        userId: '5dbc29eaa5abee6d15c98af4',
     },
     {
         author: 'Jussi J',
         title: 'Kalahommia',
         url: 'kalaa.fi',
-        likes: 6
+        likes: 6,
+        userId: '5dbc29eaa5abee6d15c98af4',
     },
     {
         author: 'Jarmo K',
         title: 'AutoiluBlogi',
         url: 'jarmoajelee.fi',
-        likes: 14
+        likes: 14,
+        userId: '5dbc2a0ba5abee6d15c98af5',
     },
     {
         author: 'Keijo K',
         title: 'Metsästysjuttuja',
         url: 'metsalle.fi',
-        likes: 2
+        likes: 2,
+        userId: '5dbc2a0ba5abee6d15c98af5',
     },
 ]
 
@@ -31,6 +35,7 @@ const insertBlog = {
     author: 'Kalle K',
     title: 'Sienestys',
     url: 'sienimetsalle.fi',
+    userId: '5dbc2a0ba5abee6d15c98af5',
 }
 
 const invalidBlog = {
